@@ -1,4 +1,5 @@
 import { WbError } from "./WbError";
+import {WbResponse} from "./WbType";
 
 
 
@@ -6,9 +7,9 @@ import { WbError } from "./WbError";
 
 
 interface wbFetch {
-  getFetch(url: string): Promise<Response>
-  postFetch(url: string, body: any): Promise<Response>
-  apiFetch(url:string,method:'GET'|'POST'|'PUT'|'DELETE',body?:'undefine'|'object'|'string'  ):Promise<any|undefined>
+  getFetch(url: string): Promise<WbResponse|undefined|any>
+  postFetch(url: string, body: any): Promise<WbResponse|undefined|any>
+  apiFetch(url:string,method:'GET'|'POST'|'PUT'|'DELETE',body?:undefined|'object'|'string'  ):Promise<WbResponse|undefined|any>
 
 }
 
@@ -20,14 +21,14 @@ interface wbFetchFull extends wbFetch{
 export class WbBaseAPI implements wbFetch{
   protected wildberriesRU_URL = 'https://suppliers-api.wildberries.ru'
 
-  async getFetch(url: string): Promise<Response> {
+  async getFetch(url: string): Promise<any> {
     return this.apiFetch(url,'GET')  
   }
-  async postFetch(url: string, body: any): Promise<Response>{
+  async postFetch(url: string, body: any): Promise<any>{
     return this.apiFetch(url,'POST',body)
   }
 
-  async apiFetch(url:string,method:'GET'|'POST'|'PUT'|'DELETE',body?:'undefine'){
+  async apiFetch(url:string,method:'GET'|'POST'|'PUT'|'DELETE',body?:undefined):Promise<any>{
        let init:RequestInit = {
          method:method,
          headers:{
@@ -40,7 +41,7 @@ export class WbBaseAPI implements wbFetch{
        }
        return  fetch(url, init).then(async(response:Response)=>{
          if(response.status === 200){
-           return response.json()
+           return await response.json()
          }else{
            await response.json().then((data:WbError)=>{
               return Promise.reject(data)
