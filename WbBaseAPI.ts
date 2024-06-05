@@ -2,10 +2,6 @@ import { WbError } from "./WbError";
 import {WbResponse} from "./WbType";
 
 
-
-
-
-
 interface wbFetch {
   getFetch(url: string): Promise<WbResponse|undefined|any>
   postFetch(url: string, body: any): Promise<WbResponse|undefined|any>
@@ -43,8 +39,8 @@ export class WbBaseAPI implements wbFetch{
          if(response.status === 200){
            return await response.json()
          }else{
-           await response.json().then((data:WbError)=>{
-              return Promise.reject(data)
+           await response.json().then((data:{responseError:{status:Number,statusText:String},responseData:WbError|any})=>{
+              return Promise.reject({responseError:{status:response.status,statusText:response.statusText},responseData:data})
            })
          }
        })

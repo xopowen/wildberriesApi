@@ -1,9 +1,10 @@
 import {WbBaseAPI} from "./WbBaseAPI";
 import {WbError} from "./WbError";
-import type {SettingsRequestListNomenclature, Variant, WbResponse, WorkVariant} from "./WbType";
+import type {SettingsRequestListNomenclature, Variant, WbResponse, WorkVariant } from "./WbType";
 
 
-type PropertyItem = {
+
+export type PropertyItem = {
     "charcID": Number,
     "subjectName": String,
     "subjectID": Number,
@@ -15,32 +16,35 @@ type PropertyItem = {
     "charcType": Number
 }
 
-type QueryParamsDefault={locale?: 'ru'| 'en' | 'zh'}
+export type QueryParamsDefault={locale?: 'ru'| 'en' | 'zh'}
 
-type Tag =
-    {
-        "id": Number,
-        "color": 'D1CFD7'| //- серый
-                 'FEE0E0'| // - красный
-                 'ECDAFF'| // - фиолетовый
-                 'E4EAFF'| // - синий
-                 'DEF1DD'| // - зеленый
-                 'FFECC7',
-        "name": String
-    }
-
+export type Tag = {
+    "id": Number,
+    "color": 'D1CFD7'| //- серый
+        'FEE0E0'| // - красный
+        'ECDAFF'| // - фиолетовый
+        'E4EAFF'| // - синий
+        'DEF1DD'| // - зеленый
+        'FFECC7',
+    "name": String
+}
 interface WbContactInterface {
     //donload
 
-    postCreateCard(data: Array<{ subjectID: Number; variants: Array<Variant> }>,): Promise<WbResponse|undefined >;
-    postChangeCard(data: Array<WorkVariant>): Promise<WbResponse | WbError>;
-    postAddNomencltureToCards(data: Array<{ imtID: Number, cardsToAdd: Array<Variant> }>): Promise<WbResponse | WbError>;
-    postUnionORDesunionNomenclature(data: { targetIMT: Number, nmIDs: Array<Number> }): Promise<WbResponse | WbError>;
-    postGenerateBarcodes(data: { conut: Number }): Promise<WbResponse & { data: Array<String> } | WbError>;
+    postCreateCard(queryData: Array<{ subjectID: Number; variants: Array<Variant> }>,):
+        Promise<WbResponse|undefined >;
+    postChangeCard(queryData: Array<WorkVariant>):
+        Promise<WbResponse | undefined>;
+    postAddNomencltureToCards(queryData: Array<{ imtID: Number, cardsToAdd: Array<Variant> }>):
+        Promise<WbResponse | undefined>;
+    postUnionORDesunionNomenclature(queryData: { targetIMT: Number, nmIDs: Array<Number> }):
+        Promise<WbResponse | undefined>;
+    postGenerateBarcodes(queryData: { conut: Number }):
+        Promise<WbResponse & { data: Array<String> } | undefined>;
 
     //show
     //method post
-    getListNomenclature(data: { settings: SettingsRequestListNomenclature },queryParams?:QueryParamsDefault): Promise<WbResponse & {
+    getListNomenclature(queryData: { settings: SettingsRequestListNomenclature },queryParams?:QueryParamsDefault): Promise<WbResponse & {
         data: Array<String>
     } | WbError>;
     getListNomenclatureNotCreate(queryParams?:QueryParamsDefault): Promise<WbResponse & {
@@ -105,8 +109,8 @@ interface WbContactInterface {
     //tags
 
     getListTag():Promise<WbResponse & {data:Array<Tag>} |WbError>
-    postTag(queryBody:Omit<Tag, { id }>):Promise<WbResponse|WbError>
-    patchTag(tagId:Number,queryBody:Omit<Tag, { id }>):Promise<WbResponse|WbError>
+    postTag(queryBody:Omit<Tag,  'id' >):Promise<WbResponse|WbError>
+    patchTag(tagId:Number,queryBody:Omit<Tag,  'id' >):Promise<WbResponse|WbError>
     delTag(tagId:Number):Promise<WbResponse|WbError>
     postAdd_OR_RemoveTagToCard(queryBody:{ "nmID": Number, "tagsIDs": Array<Number> }):Promise<WbResponse|WbError>
 
@@ -133,7 +137,7 @@ export class WbContact extends WbBaseAPI implements WbContactInterface{
         //конфигуратор
         listCategory: this.additionURL + "/v2/object/parent/all",
         listItem: this.additionURL + "/v2/object/all",
-        propertyItem: this.additionURL + "/v2/object/charcs", // + {subjectId}
+        propertyItem: (subjectId)=>this.additionURL + "/v2/object/charcs/"+subjectId, // +
 
         propertyColor: this.additionURL + "/v2/directory/colors",
         propertyGender: this.additionURL + "/v2/directory/kinds",
@@ -147,7 +151,7 @@ export class WbContact extends WbBaseAPI implements WbContactInterface{
         mediaAdd: this.additionURL + "/v3/media/file",
         // теги
         listTags: this.additionURL + "/v2/tags",
-        tag: this.additionURL + "/v2/tag", // - add , + {id} - del,change
+        tag:(id)=> this.additionURL + "/v2/tag/"+id, // - add , + {id} - del,change
         CardAddOrRemoveTag: this.additionURL + "/v2/tag/nomenclature/link",
         // корзина
         nomenclatureToBasket: this.additionURL + "/v2/cards/delete/trash",
@@ -157,10 +161,17 @@ export class WbContact extends WbBaseAPI implements WbContactInterface{
 
     /**
      *
-     * @param {} data
+     * @param { Array<{ subjectID: Number; variants: Array<Variant> }>} queryData
      */
-    async postCreateCard(data: Array<{ subjectID: Number; variants: Array<Variant> }>): Promise<WbResponse | undefined> {
-        return await this.postFetch(this.listAPI.cardAddNomenclature,data)
+    async postCreateCard(queryData: Array<{ subjectID: Number; variants: Array<Variant> }>): Promise<WbResponse | undefined> {
+        return this.postFetch(this.listAPI.cardAddNomenclature,queryData)
+            .then(async (value:WbResponse)=>value)
+            .catch(async (data:WbError)=>Promise.reject(data))
+
     }
 
 }
+
+let a = new WbContact('dadaism').postCreateCard([{ subjectID: 121212, variants: [] }])
+    .then((value:WbResponse)=>value)
+})

@@ -1,8 +1,14 @@
+import {Tag} from "./WbContact";
+
+type AdditionError = {
+  "field": "string",
+  "description": "string"
+}
 export type WbResponse = {
   data: null | Object | Array<Object>;
   error: Boolean;
   errorText: string;
-  additionalErrors: null | Object | String;
+  additionalErrors: null | Object | String| Array<AdditionError | any>;
 };
 
 //contact
@@ -70,11 +76,7 @@ export type NomenclatureCard = {
     techSize: String;
     skus: Array<String>;
   }>;
-  tags: Array<{
-    id: Number;
-    name: String;
-    color: String;
-  }>;
+  tags: Array<Tag>;
   createdAt: String; //Date
   updatedAt: String; //Date
 };
@@ -87,3 +89,5 @@ export type listNomenclature = {
   cards: Array<NomenclatureCard>;
   cursor: Cursor & { total: Number };
 };
+
+
