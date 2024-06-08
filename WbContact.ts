@@ -1,5 +1,5 @@
 import {WbBaseAPI} from "./WbBaseAPI";
-import {WbError} from "./WbError";
+import {WbError, WbErrorData} from "./WbError";
 import type {SettingsRequestListNomenclature, Variant, WbResponse, WorkVariant } from "./WbType";
 
 
@@ -162,16 +162,21 @@ export class WbContact extends WbBaseAPI implements WbContactInterface{
     /**
      *
      * @param { Array<{ subjectID: Number; variants: Array<Variant> }>} queryData
+     * @see WbResponse
+     * @throws {WbError} - can see in promise.catch
+     * @return Promise<WbResponse | undefined >
      */
-    async postCreateCard(queryData: Array<{ subjectID: Number; variants: Array<Variant> }>): Promise<WbResponse | undefined> {
-        return this.postFetch(this.listAPI.cardAddNomenclature,queryData)
-            .then(async (value:WbResponse)=>value)
-            .catch(async (data:WbError)=>Promise.reject(data))
+    async postCreateCard(queryData: Array<{ subjectID: Number; variants: Array<Variant> }>): Promise<WbResponse | undefined > {
+        return this.postFetch(this.listAPI.cardAddNomenclature,queryData).then(async (response:Response|undefined)=>{
+            if( response?.ok){
+                return await response?.json().then((data:WbResponse)=>data)
+            }
+            return
+        })
+            .catch((reason:WbErrorData)=>Promise.reject(reason))
+
 
     }
 
 }
 
-let a = new WbContact('dadaism').postCreateCard([{ subjectID: 121212, variants: [] }])
-    .then((value:WbResponse)=>value)
-})

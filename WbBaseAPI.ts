@@ -17,14 +17,24 @@ interface wbFetchFull extends wbFetch{
 export class WbBaseAPI implements wbFetch{
   protected wildberriesRU_URL = 'https://suppliers-api.wildberries.ru'
 
-  async getFetch(url: string): Promise<any> {
-    return this.apiFetch(url,'GET')  
+  async getFetch(url: string): Promise<any|undefined> {
+    return this.apiFetch(url,'GET').then(async (response)=>{
+        if(response?.ok){
+            return await response.json()
+        }
+        return
+    })
   }
-  async postFetch(url: string, body: any): Promise<any>{
-    return this.apiFetch(url,'POST',body)
+  async postFetch(url: string, body: any): Promise<any|undefined>{
+    return this.apiFetch(url,'POST',body).then(async (response)=>{
+        if(response?.ok){
+            return await response.json()
+        }
+        return
+    })
   }
 
-  async apiFetch(url:string,method:'GET'|'POST'|'PUT'|'DELETE',body?:undefined):Promise<any>{
+  async apiFetch(url:string,method:'GET'|'POST'|'PUT'|'DELETE',body?:undefined):Promise<Response|undefined>{
        let init:RequestInit = {
          method:method,
          headers:{
@@ -37,10 +47,10 @@ export class WbBaseAPI implements wbFetch{
        }
        return  fetch(url, init).then(async(response:Response)=>{
          if(response.status === 200){
-           return await response.json()
+           return response
          }else{
-           await response.json().then((data:{responseError:{status:Number,statusText:String},responseData:WbError|any})=>{
-              return Promise.reject({responseError:{status:response.status,statusText:response.statusText},responseData:data})
+           await response.json().then((data:{responseError:{status:Number,statusText:String},errorData:any})=>{
+              return Promise.reject({responseError:{status:response.status,statusText:response.statusText},errorData:data})
            })
          }
        })
