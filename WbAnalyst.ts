@@ -3,6 +3,9 @@ import {WbResponse} from "./WbType";
 import {Tag} from "./WbContact";
 import {WbError, WbErrorData} from "./WbError";
 
+/**
+ * TODO made doc
+ */
 enum FiendSort {
     openCard = 'openCard',
     addToCart = 'addToCart',
@@ -18,41 +21,117 @@ enum FiendSort {
 }
 
 enum StatusCreatingJemReport {
-    WAITING = 'WAITING', // — в очереди на обработку
-    PROCESSING = 'PROCESSING', // — генерируется
-    SUCCESS = 'SUCCESS', //— готов
-    RETRY = 'RETRY',// — ожидает повторной обработки
-    FAILED = 'FAILED'//не получилось сгенерировать
+    /**
+     * в очереди на обработку
+     */
+    WAITING = 'WAITING',
+    /**
+     * генерируется
+     */
+    PROCESSING = 'PROCESSING',
+    /**
+     * готов
+     */
+    SUCCESS = 'SUCCESS',
+    /**
+     * ожидает повторной обработки
+     */
+    RETRY = 'RETRY' ,
+    /**
+     * не получилось сгенерировать
+     */
+    FAILED = 'FAILED'
 }
 
 enum StatusCratingStoragePaidReport {
-    new = 'new', // — новое
-    processing = "processing",// — обрабатывается
-    done = "done", // — отчёт готов
-    purged = "purged", //— отчёт удалён
-    canceled = 'canceled' //— отклонено
+    /**
+     * новое
+     */
+    new = 'new',
+    /**
+     *  обрабатывается
+     */
+    processing = "processing",
+    /**
+     * отчёт готов
+     */
+    done = "done",
+    /**
+     * отчёт удалён
+     */
+    purged = "purged",
+    /**
+     * отклонено
+     */
+    canceled = 'canceled'
 }
 
 
 type ShameRequestStaticCard =
     {
-    "brandNames"?: Array<String>,
-    "objectIDs"?: Array< number>,
-    "tagIDs"?: Array< number>,
-    "nmIDs"?: Array< number>,
-    "timezone"?: string,//https://nodatime.org/TimeZones
+    /**
+     * Название бренда
+     * @type {Array<string>}
+     * @memberof NmReportDetailRequest
+     */
+    brandNames?: Array<string>;
+    /**
+     * Идентификатор предмета
+     * @type {Array<number>}
+     * @memberof NmReportDetailRequest
+     */
+    objectIDs?: Array<number>;
+    /**
+     * Идентификатор тега
+     * @type {Array<number>}
+     * @memberof NmReportDetailRequest
+     */
+    tagIDs?: Array<number>;
+    /**
+     * Артикул WB
+     * @type {Array<number>}
+     * @memberof NmReportDetailRequest
+     */
+    nmIDs?: Array<number>;
+    /**
+     * Временная зона.<br> Если не указано, то по умолчанию используется Europe/Moscow.
+     * @type {string}
+     * @memberof NmReportDetailRequest
+     */
+    timezone?: string;
+    /**
+     *
+     * @type {StaticPeriod}
+     * @memberof NmReportDetailRequest
+     */
     "period": StaticPeriod,
     "orderBy"?: {
         "field": FiendSort,
         "mode": string
     },
-    "page":  number
+    /**
+     * Страница
+     * @type {number}
+     * @memberof NmReportDetailRequest
+     */
+    page: number;
 }
 type CardObject = {
-    "id":  number,
-    "name": string
+    /**
+     * Идентификатор предмета
+     * @type {number}
+     * @memberof NmReportDetailResponseDataObject
+     */
+    id: number;
+    /**
+     * Название предмета
+     * @type {string}
+     * @memberof NmReportDetailResponseDataObject
+     */
+    name: string;
 }
 /**
+ * @TODO проверить обязательность параметров
  * @param begin - Data format yy-mm-dd
  * @param end - Data format yy-mm-dd
  */
@@ -73,7 +152,8 @@ type StaticPeriod = {
 type PeriodFromTo = {
     dateFrom: string,
     dateTo: string
-}/**
+}
+/**
  *
  * @description data format RFC3339
  * @example
@@ -81,110 +161,490 @@ type PeriodFromTo = {
  *
  */
 type PeriodFromToData = PeriodFromTo
-type Statistics = {
-    "openCardDynamics":  number,
-    "addToCartDynamics":  number,
-    "ordersCountDynamics":  number,
-    "ordersSumRubDynamics":  number,
-    "buyoutsCountDynamics":  number,
-    "buyoutsSumRubDynamics":  number,
-    "cancelCountDynamics":  number,
-    "cancelSumRubDynamics":  number,
-    "avgOrdersCountPerDayDynamics":  number,
-    "avgPriceRubDynamics":  number,
-    "conversions": {
-        "addToCartPercent":  number,
-        "cartToOrderPercent":  number,
-        "buyoutsPercent":  number
-    }
+/**
+ * Конверсии
+ * @export
+ * @interface NmReportDetailResponseDataStatisticsPeriodComparisonConversions
+ */
+export interface NmReportDetailResponseDataStatisticsPeriodComparisonConversions {
+    /**
+     * Конверсия в корзину, % (Какой процент посетителей, открывших карточку товара, добавили товар в корзину)
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparisonConversions
+     */
+    addToCartPercent: number;
+    /**
+     * Конверсия в заказ, % (Какой процент посетителей, добавивших товар в корзину, сделали заказ)
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparisonConversions
+     */
+    cartToOrderPercent: number;
+    /**
+     * Процент выкупа, % (Какой процент посетителей, заказавших товар, его выкупили. Без учёта товаров, которые еще доставляются покупателю.)
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparisonConversions
+     */
+    buyoutsPercent: number;
 }
-type StatisticsPeriod = Statistics & StaticPeriod
-type CardStatistic = {
-    "nmID": 1234567,
-    "vendorCode": "supplierVendor",
-    "brandName": "Some",
+/**
+ * Сравнение двух периодов, в процентах
+ */
+type NmReportDetailResponseDataStatisticsPeriodComparison = {
+    /**
+     * Динамика переходов в карточку товара
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    openCardDynamics: number;
+    /**
+     * Динамика добавлений в корзину
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    addToCartDynamics: number;
+    /**
+     * Динамика количества заказов
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    ordersCountDynamics: number;
+    /**
+     * Динамика суммы заказов, рублей
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    ordersSumRubDynamics: number;
+    /**
+     * Динамика выкупов, штук
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    buyoutsCountDynamics: number;
+    /**
+     * Динамика суммы выкупов, рублей
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    buyoutsSumRubDynamics: number;
+    /**
+     * Динамика отмен товаров, штук
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    cancelCountDynamics: number;
+    /**
+     * Динамика сумм отмен товаров, рублей
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    cancelSumRubDynamics: number;
+    /**
+     * Динамика среднего количества заказов в день
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    avgOrdersCountPerDayDynamics: number;
+    /**
+     * Динамика средней цены на товары. Учитываются скидки для акций и WB скидка.
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    avgPriceRubDynamics: number;
+    /**
+     *
+     * @memberof NmReportDetailResponseDataStatisticsPeriodComparison
+     */
+    "conversions": NmReportDetailResponseDataStatisticsPeriodComparisonConversions
+}
+type NmReportDetailResponseDataStatisticsPeriod = NmReportDetailResponseDataStatisticsPeriodComparison & StaticPeriod
+export interface NmReportDetailResponseDataStocks {
+    /**
+     * Остатки МП, шт. (Общее количество остатков на складе продавца)
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStocks
+     */
+    stocksMp: number;
+    /**
+     * Остатки на складах Wildberries (Общее количество остатков на складах Wildberries)
+     * @type {number}
+     * @memberof NmReportDetailResponseDataStocks
+     */
+    stocksWb: number;
+}
+type NmCardStatistic = {
+    /**
+     * Артикул WB
+     * @type {number}
+     * @memberof NmReportDetailResponseDataCards
+     */
+    nmID: number;
+    /**
+     * Артикул продавца
+     * @type {string}
+     * @memberof NmReportDetailResponseDataCards
+     */
+    vendorCode: string;
+    /**
+     * Название бренд
+     * @type {string}
+     * @memberof NmReportDetailResponseDataCards
+     */
+    brandName: string;
+    /**
+     * Теги
+     * @type {Array<Tag>}
+     * @memberof NmReportDetailResponseDataCards
+     */
     "tags": Array<Omit<Tag, 'color'>>,
     "object": CardObject,
     "statistics": {
-        "selectedPeriod": StatisticsPeriod,
-        "previousPeriod": StatisticsPeriod,
-        "periodComparison": Statistics
+        "selectedPeriod": NmReportDetailResponseDataStatisticsPeriod,
+        "previousPeriod": NmReportDetailResponseDataStatisticsPeriod,
+        "periodComparison": NmReportDetailResponseDataStatisticsPeriodComparison
     },
-    "stocks": {
-        "stocksMp":  number,
-        "stocksWb":  number
-    }
+    "stocks":NmReportDetailResponseDataStocks
 }
 type uuid = string
-type HistoryNomenclatureStatisItem = {
-    "dt": string,//Data
-    "openCardCount":  number,
-    "addToCartCount":  number,
-    "ordersCount":  number,
-    "ordersSumRub":  number,
-    "buyoutsCount":  number,
-    "buyoutsSumRub":  number,
-    "buyoutPercent":  number,
-    "addToCartConversion":  number,
-    "cartToOrderConversion":  number
+export interface NmReportDetailHistoryResponseHistory {
+    /**
+     * Дата
+     * @type {string}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    dt: string;
+    /**
+     * Количество переходов в карточку товара
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    openCardCount: number;
+    /**
+     * Положили в корзину, штук
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    addToCartCount: number;
+    /**
+     * Заказали товаров, шт
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    ordersCount: number;
+    /**
+     * Заказали на сумму, руб.
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    ordersSumRub: number;
+    /**
+     * Выкупили товаров, шт.
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    buyoutsCount: number;
+    /**
+     * Выкупили на сумму, руб.
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    buyoutsSumRub: number;
+    /**
+     * Процент выкупа, % (Какой процент посетителей, заказавших товар, его выкупили. Без учёта товаров, которые еще доставляются покупателю.)
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    buyoutPercent: number;
+    /**
+     * Конверсия в корзину, % (Какой процент посетителей, открывших карточку товара, добавили товар в корзину)
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    addToCartConversion: number;
+    /**
+     * Конверсия в заказ, % (Какой процент посетителей, добавивших товар в корзину, сделали заказ)
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseHistory
+     */
+    cartToOrderConversion: number;
 }
 type ParamsItemNmID = {
-    "nmIDs"?: Array< number>,
-    "subjectIDs"?: Array< number>,
-    "brandNames"?: Array<String>,
-    "tagIDs"?: Array< number>,
-    "startDate": string,//Data
-    "endDate": string,//Data
-    "timezone": string,
+    /**
+     * `nmID `, по которым составить отчёт. Оставьте пустым, чтобы получить отчёт по всем товарам
+     * @type {Array<number>}
+     * 
+     */
+    nmIDs?: Array<number>;
+    /**
+     * Идентификаторы предметов
+     * @type {Array<number>}
+     * 
+     */
+    subjectIDs?: Array<number>;
+    /**
+     * Бренды
+     * @type {Array<string>}
+     * 
+     */
+    brandNames?: Array<string>;
+    /**
+     * Идентификаторы тегов
+     * @type {Array<number>}
+     * 
+     */
+    tagIDs?: Array<number>;
+    /**
+     * Начало периода
+     * @type {string}
+     * @example "2023-06-21"
+     */
+    startDate: string;
+    /**
+     * Конец периода
+     * @type {string}
+     * @example "2023-06-21"
+     */
+    endDate: string;
+    /**
+     * Временная зона, по умолчанию Europe/Moscow
+     * @type {string}
+     * 
+     */
+    timezone?: string;
+    /**
+     * Как сгруппировать данные (по умолчанию по дням):    * `day` — по дням   * `week` — по неделям   * `month` — по месяцам
+     * @type {string}
+     * 
+     */
     "aggregationLevel": "day" | 'week' | 'month',
-    "skipDeletedNm": Boolean
+    /**
+     * Скрыть удалённые номенклатуры
+     * @type {boolean}
+     * 
+     */
+    skipDeletedNm?: boolean;
 }
-type ParamsitemBrandOrTag = Omit<ParamsItemNmID, 'nmIDs'>
+
+type ParamsItemBrandOrTag = Omit<ParamsItemNmID, 'nmIDs'>
 type JemReportRequestNmID = {
+    /**
+     * Идентификатор отчёта в UUID-формате. Генерируется продавцом самостоятельно
+     * @type {string}
+     * @memberof BySelectedNmIDReq
+     */
     "id": uuid,
-    "reportType": " DETAIL_HISTORY_REPORT",
-    "userReportName"?: "Subject report",
+    /**
+     * Тип отчёта — `DETAIL_HISTORY_REPORT`
+     * @type {string}
+     * @memberof BySelectedNmIDReq
+     */
+    "reportType": "DETAIL_HISTORY_REPORT",
+    /**
+     * Название отчёта (если не указано, сформируется автоматически)
+     * @type {string}
+     * @memberof BySelectedNmIDReq
+     */
+    "userReportName"?: string,
     "params": ParamsItemNmID
 }
 type JemReportRequestBandAndTag = JemReportRequestNmID &
     {
-        "params": ParamsitemBrandOrTag,
+        "params": ParamsItemBrandOrTag,
+        /**
+         * Тип отчёта — `GROUPED_HISTORY_REPORT`
+         * @type {string}
+         * @memberof GroupedByObjectsBrandsAndTagsReq
+         */
         "reportType": "GROUPED_HISTORY_REPORT"
     }
-type PaidStorageReport =   {
-    "date": string,//Data
-    "logWarehouseCoef":  number,
-    "officeId":  number,
-    "warehouse": string,
-    "warehouseCoef": string,
-    "giId": string,
-    "chrtId":  number,
-    "size": string,
-    "barcode": string,
-    "subject": string,
-    "brand": string,
-    "vendorCode": string,
-    "nmId":  number,
-    "volume":  number,
-    "calcType": string,
-    "warehousePrice":  number,
-    "barcodesCount":  number,
-    "palletPlaceCode":  number,
-    "palletCount":  number,
-    "originalDate": string,//Data
-    "loyaltyDiscount":  number,
-    "tariffFixDate": string,//Data
-    "tariffLowerDate": string,//Data
+type ResponsePaidStorageInner =   {
+    /**
+     * Дата, за которую был расчёт или перерасчёт
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    date: string;
+    /**
+     * Коэффициент логистики и хранения
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    logWarehouseCoef: number;
+    /**
+     * ID склада
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    officeId: number;
+    /**
+     * Название склада
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    warehouse: string;
+    /**
+     * Коэффициент склада
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    warehouseCoef: number;
+    /**
+     * ID поставки
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    giId: number;
+    /**
+     * Идентификатор размера для этого артикула Wildberries
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    chrtId: number;
+    /**
+     * Размер (`techSize` в карточке товара)
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    size: string;
+    /**
+     * Баркод
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    barcode: string;
+    /**
+     * Предмет
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    subject: string;
+    /**
+     * Бренд
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    brand: string;
+    /**
+     * Артикул продавца
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    vendorCode: string;
+    /**
+     * Артикул Wildberries
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    nmId: number;
+    /**
+     * Объём товара
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    volume: number;
+    /**
+     * Способ расчёта
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    calcType: string;
+    /**
+     * Сумма хранения
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    warehousePrice: number;
+    /**
+     * Количество единиц товара (штук), подлежащих тарифицированию за расчётные сутки
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    barcodesCount: number;
+    /**
+     * Код паллетоместа
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    palletPlaceCode: number;
+    /**
+     * Количество паллет
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    palletCount: number;
+    /**
+     * Если был перерасчёт, это дата первоначального расчёта. Если перерасчёта не было, совпадает с `date`
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    originalDate: string;
+    /**
+     * Скидка программы лояльности, ₽
+     * @type {number}
+     * @memberof ResponsePaidStorageInner
+     */
+    loyaltyDiscount: number;
+    /**
+     * Дата фиксации тарифа
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    tariffFixDate: string;
+    /**
+     * Дата понижения тарифа
+     * @type {string}
+     * @memberof ResponsePaidStorageInner
+     */
+    tariffLowerDate: string;
 }
 type PaidAcceptedReport = {
-    "count":  number,
-    "giCreateDate": string,//Data
-    "incomeId":  number,
-    "nmID":  number,
-    "shkСreateDate": string,//Data
-    "subjectName": string,
-    "sum":  number,
-    "total":  number
+    /**
+     * Количество товаров, шт.
+     * @type {number}
+     * @memberof InlineResponse200Report
+     */
+    count: number;
+    /**
+     * Дата создания поставки
+     * @type {string}
+     * @memberof InlineResponse200Report
+     */
+    giCreateDate: string;
+    /**
+     * Номер поставки
+     * @type {number}
+     * @memberof InlineResponse200Report
+     */
+    incomeId: number;
+    /**
+     * Артикул Wildberries
+     * @type {number}
+     * @memberof InlineResponse200Report
+     */
+    nmID: number;
+    /**
+     * Дата приёмки
+     * @type {string}
+     * @memberof InlineResponse200Report
+     */
+    shkreateDate: string;
+    /**
+     * Предмет (подкатегория)
+     * @type {string}
+     * @memberof InlineResponse200Report
+     */
+    subjectName: string;
+    /**
+     * Суммарная стоимость приёмки, ₽
+     * @type {number}
+     * @memberof InlineResponse200Report
+     */
+    sum: number;
+    /**
+     * Суммарная стоимость приёмки, ₽ с копейками
+     * @type {number}
+     * @memberof InlineResponse200Report
+     */
+    total: number;
 }
 
 type CoefficentItem =   {
@@ -203,172 +663,480 @@ type CoefficentItem =   {
     "volume":  number,
     "width":  number
 }
+
+export type NmReportDetailResponseData = {
+    /**
+     * Страница
+     * @type {number}
+     * @memberof NmReportDetailResponseData
+     */
+    page: number;
+    /**
+     * Есть ли следующая страница (false - нет, true - есть)
+     * @type {boolean}
+     * @memberof NmReportDetailResponseData
+     */
+    isNextPage: boolean;
+    /**
+     *
+     * @type {Array<NmCardStatistic>}
+     * @memberof NmReportDetailResponseData
+     */
+    cards: Array<NmCardStatistic>;
+}
+export type NmReportDetailHistoryRequest = {
+    /**
+     * Артикул Wildberries (максимум 20)
+     * @type {Array<number>}
+     * @memberof NmReportDetailHistoryRequest
+     */
+    nmIDs: Array<number>;
+    /**
+     *
+     * @type {StaticPeriod}
+     * @memberof NmReportDetailHistoryRequest
+     */
+    period: StaticPeriod;
+    /**
+     * Временная зона.<br> Если не указано, то по умолчанию используется Europe/Moscow.
+     * @type {string}
+     * @memberof NmReportDetailHistoryRequest
+     */
+    timezone?: string;
+    /**
+     * Тип агрегации. Если не указано, то по умолчанию используется агрегация по дням.
+     * <br> Доступные уровни агрегации `day`, `week`
+     * @type {string}
+     * @memberof NmReportDetailHistoryRequest
+     */
+    "aggregationLevel"?: 'day' | 'week'
+}
+export type NmReportDetailHistoryResponseData = {
+    /**
+     * Артикул WB
+     * @type {number}
+     * @memberof NmReportDetailHistoryResponseData
+     */
+    nmID: number;
+    /**
+     * Наименование КТ
+     * @type {string}
+     * @memberof NmReportDetailHistoryResponseData
+     */
+    imtName: string;
+    /**
+     * Артикул продавца
+     * @type {string}
+     * @memberof NmReportDetailHistoryResponseData
+     */
+    vendorCode: string;
+    /**
+     *
+     * @type {Array<NmReportDetailHistoryResponseHistory>}
+     * @memberof NmReportDetailHistoryResponseData
+     */
+    history: Array<NmReportDetailHistoryResponseHistory>;
+}
+export type NmReportGroupedHistoryResponseData =  {
+    /**
+     *
+     * @type {NmReportGroupedHistoryResponseObject}
+     * @memberof NmReportGroupedHistoryResponseData
+     */
+    object: CardObject;
+    /**
+     * Название бренда
+     * @type {string}
+     * @memberof NmReportGroupedHistoryResponseData
+     */
+    brandName: string;
+    /**
+     *
+     * @type {NmReportGroupedHistoryResponseTag}
+     * @memberof NmReportGroupedHistoryResponseData
+     */
+    tag: Omit<Tag, 'color'>;
+    /**
+     *
+     * @type {Array<NmReportGroupedHistoryResponseHistory>}
+     * @memberof NmReportGroupedHistoryResponseData
+     */
+    history: Array<NmReportDetailHistoryResponseHistory>;
+}
+export type NmReportGetReportsResponseData= {
+    /**
+     * Идентификатор отчёта
+     * @type {string}
+     * @memberof NmReportGetReportsResponseData
+     */
+    id: string;
+    /**
+     * Дата и время завершения генерации
+     * @example 2023-06-26 20:05:32
+     * @type {Date}
+     * @memberof NmReportGetReportsResponseData
+     */
+    createdAt: Date;
+    /**
+     * Статус отчёта:  * `WAITING` — в очереди на обработку * `PROCESSING` — генерируется * `SUCCESS —` готов * `RETRY` — ожидает повторной обработки * `FAILED` — не получилось сгенерировать, сгенерируйте повторно
+     * @type {string}
+     * @memberof NmReportGetReportsResponseData
+     */
+    status: StatusCreatingJemReport;
+    /**
+     * Название отчёта
+     * @type {string}
+     * @memberof NmReportGetReportsResponseData
+     */
+    name: string;
+    /**
+     * Размер отчёта, Б
+     * @type {number}
+     * @memberof NmReportGetReportsResponseData
+     */
+    size: number;
+    /**
+     * Начало периода
+     * @example 2023-06-21
+     * @type {string}
+     * @memberof NmReportGetReportsResponseData
+     */
+    startDate: string;
+    /**
+     * Конец периода
+     * @example 2023-06-21
+     * @type {string}
+     * @memberof NmReportGetReportsResponseData
+     */
+    endDate: string;
+}
+export type CreateTaskResponseData =  {
+    /**
+     * ID задания на генерацию
+     * @type {string}
+     * @memberof CreateTaskResponseData
+     */
+    taskId: string;
+}
+export type GetTasksResponseData = {
+    /**
+     * ID задания
+     * @type {string}
+     * @memberof GetTasksResponseData
+     */
+    id: string;
+    /**
+     * Статус задания:      * `new` — новое   * `processing` —  обрабатывается   * `done` — отчёт готов   * `purged` — отчёт удалён   * `canceled` — отклонено
+     * @type {string}
+     * @memberof GetTasksResponseData
+     */
+    status: StatusCratingStoragePaidReport;
+}
+export type ModelsExciseReportResponseDataInner ={
+    /**
+     * Страна покупателя
+     * @type {string}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    name: string;
+    /**
+     * Цена товара, с НДС
+     * @type {number}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    price: number;
+    /**
+     * Валюта
+     * @type {string}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    currency_name_short: string;
+    /**
+     * Код маркировки
+     * @type {string}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    excise_short: string;
+    /**
+     * Баркод
+     * @type {string}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    barcode: string;
+    /**
+     * Артикул Wildberries
+     * @type {number}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    nm_id: number;
+    /**
+     * Тип операции, если есть:    * `1` — вывод из оборота   * `2` — возврат в оборот
+     * @type {number}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    operation_type_id: number;
+    /**
+     * Номер фискального документа (чека полного расчёта), если есть
+     * @type {number}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    fiscal_doc_number: number;
+    /**
+     * Дата фискализации (дата в чеке), если есть, `ГГГГ-ММ-ДД`
+     * @type {string}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    fiscal_dt: string;
+    /**
+     * Номер фискального накопителя, если есть
+     * @type {string}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    fiscal_drive_number: string;
+    /**
+     * `Rid`
+     * @type {number}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    rid: number;
+    /**
+     * `Srid`
+     * @type {string}
+     * @memberof ModelsExciseReportResponseDataInner
+     */
+    srid: string;
+}
+export type InlineResponse2001Details ={
+    /**
+     * Артикул Wildberries
+     * @type {number}
+     * @memberof InlineResponse2001Details
+     */
+    nmID: number;
+    /**
+     * Сумма заказа
+     * @type {number}
+     * @memberof InlineResponse2001Details
+     */
+    sum: number;
+    /**
+     * Валюта заказа
+     * @type {string}
+     * @memberof InlineResponse2001Details
+     */
+    currency: string;
+    /**
+     * Начало отчётного периода
+     * @type {string}
+     * @example 2023-08-23
+     * @memberof InlineResponse2001Details
+     */
+    dateFrom: string;
+    /**
+     * Конец отчётного периода
+     * @type {string}
+     * @example 2023-08-23
+     * @memberof InlineResponse2001Details
+     */
+    dateTo: string;
+}
+export type InlineResponse2002Report =  {
+    /**
+     * Цена, ₽
+     * @type {number}
+     * @memberof InlineResponse2002Report
+     */
+    amount: number;
+    /**
+     * Дата
+     * @example  2023-12-01
+     * @type {string}
+     * @memberof InlineResponse2002Report
+     */
+    date: string;
+    /**
+     * Причина удержания
+     * @type {string}
+     * @memberof InlineResponse2002Report
+     */
+    lostReason: string;
+    /**
+     * Артикул Wildberries
+     * @type {number}
+     * @memberof InlineResponse2002Report
+     */
+    nmID: number;
+    /**
+     * Фото
+     * @type {string}
+     * @memberof InlineResponse2002Report
+     */
+    photoUrl: string;
+    /**
+     * Штрихкод
+     * @type {number}
+     * @memberof InlineResponse2002Report
+     */
+    shkID: number;
+}
+export type InlineResponse2004Report = {
+    /**
+     * Сумма штрафа, руб
+     * @type {number}
+     * @memberof InlineResponse2004Report
+     */
+    amount: number;
+    /**
+     * Дата
+     * @example  yyyy-mm-dd
+     * @type {Date}
+     * @memberof InlineResponse2004Report
+     */
+    date: Date;
+    /**
+     * Номер поставки
+     * @type {number}
+     * @memberof InlineResponse2004Report
+     */
+    incomeId: number;
+    /**
+     * Артикул WB
+     * @type {number}
+     * @memberof InlineResponse2004Report
+     */
+    nmID: number;
+    /**
+     * URL фото товара
+     * @type {Array<string>}
+     * @memberof InlineResponse2004Report
+     */
+    photoUrls: Array<string>;
+    /**
+     * Штрихкод товара в Wildberries
+     * @type {number}
+     * @memberof InlineResponse2004Report
+     */
+    shkID: number;
+    /**
+     * Баркод из карточки товара
+     * @type {string}
+     * @memberof InlineResponse2004Report
+     */
+    sku: string;
+}
+export interface InlineResponse2005Report {
+    /**
+     * Сумма штрафа в копейках
+     * @type {number}
+     * @memberof InlineResponse2005Report
+     */
+    amount: number;
+    /**
+     * Дата изменения характеристик товара на складе
+     * @example 2024-03-01T01:00:00Z
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    date: string;
+    /**
+     * Новый баркод в карточке товара
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    newBarcode: string;
+    /**
+     * Новый цвет
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    newColor: string;
+    /**
+     * Новый артикул продавца
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    newSa: string;
+    /**
+     * Новый штрихкод товара в Wildberries
+     * @type {number}
+     * @memberof InlineResponse2005Report
+     */
+    newShkID: number;
+    /**
+     * Новый размер
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    newSize: string;
+    /**
+     * Артикул WB
+     * @type {number}
+     * @memberof InlineResponse2005Report
+     */
+    nmID: number;
+    /**
+     * Старый баркод из карточки товара
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    oldBarcode: string;
+    /**
+     * Старый цвет
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    oldColor: string;
+    /**
+     * Старый артикул продавца
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    oldSa: string;
+    /**
+     * Старый штрихкод товара в Wildberries
+     * @type {number}
+     * @memberof InlineResponse2005Report
+     */
+    oldShkID: number;
+    /**
+     * Старый размер
+     * @type {string}
+     * @memberof InlineResponse2005Report
+     */
+    oldSize: string;
+}
 interface WbAnalystInterface {
-    postGetStatsPeriod(queryData: ShameRequestStaticCard): Promise<WbResponse &
-        {
-            page:  number,
-            isNextPage: Boolean,
-            cards: Array<CardStatistic>
-        }
-        | undefined>,
-
-    postGetStatsPeriodGroup(queryData: Omit<ShameRequestStaticCard, 'nmIDs'>): Promise<WbResponse &
-        {
-            page:  number,
-            isNextPage: Boolean,
-            cards: Array<CardStatistic>
-        }
-        | undefined>,
-
-    postGetStatsDay(queryData: {
-        "nmIDs": Array< number>,
-        "period": StaticPeriod,
-        "timezone"?: string,//https://nodatime.org/TimeZones
-        "aggregationLevel"?: 'day' | 'week'
-    }): Promise<WbResponse & {
-        data: Array<{
-            nmID: number;
-            imtName: string;
-            vendorCode: string;
-            history: HistoryNomenclatureStatisItem
-        }>
-    } |undefined>
-
-    postGetStatsDayGroup(queryData: Omit<ShameRequestStaticCard, 'orderBy' | 'page'> &
-        { aggregationLevel?: 'day' | 'week' }): Promise<WbResponse &
-        {
-            data: Array<{
-                object: CardObject,
-                brandName: string,
-                tag: Omit<Tag, 'color'>,
-                history: HistoryNomenclatureStatisItem
-            }>
-        }|undefined>
-
+    postGetStatsPeriod(queryData: ShameRequestStaticCard): Promise<WbResponse & NmReportDetailResponseData | undefined>,
+    postGetStatsPeriodGroup(queryData: Omit<ShameRequestStaticCard, 'nmIDs'>): Promise<WbResponse & NmReportDetailResponseData | undefined>,
+    postGetStatsDay(queryData: NmReportDetailHistoryRequest): Promise<WbResponse & { data: Array<NmReportDetailHistoryResponseData> } |undefined>,
+    postGetStatsDayGroup(queryData: Omit<ShameRequestStaticCard, 'orderBy' | 'page'> & { aggregationLevel?: 'day' | 'week' }): Promise<WbResponse & { data: Array<NmReportGroupedHistoryResponseData> }|undefined>
     postJemCreteReport(queryData: JemReportRequestNmID | JemReportRequestBandAndTag): Promise<WbResponse | undefined>
-
-    getJemListReport(queryParams: { filter?: Array<uuid> }): Promise<WbResponse & {
-        data: Array<{
-            "id": uuid,
-            "createdAt": string,//Data
-            "status": StatusCreatingJemReport,
-            "name": string,
-            "size":  number,
-            "startDate": string,//Data
-            "endDate": string //Data
-        }>
-    } | undefined>
-
+    getJemListReport(queryParams: { filter?: Array<uuid> }): Promise<WbResponse & { data: Array<NmReportGetReportsResponseData> } | undefined>
     postJemRepeatCreateReport(queryData: { downloadId: uuid }): Promise<WbResponse|undefined>
-
-    getJemReport(queryParams: { downloadId: uuid }): Promise<BinaryData|undefined>,
-
-    postOutputMustMark(queryData: { countries?: Array<string> }, queryParams: PeriodFromTo):
-        Promise<{
+    getJemReport(queryParams: { downloadId: uuid }): Promise<BinaryData|undefined>
+    postOutputMustMark(queryData: { countries?: Array<string> }, queryParams: PeriodFromTo): Promise<{
         "response": {
-            "data": Array<
-                {
-                    "name": string,
-                    "price":  number,
-                    "currency_name_short": string,
-                    "excise_short": string,
-                    "barcode":  number,
-                    "nm_id":  number,
-                    "operation_type_id":  number,
-                    "fiscal_doc_number":  number,
-                    "fiscal_dt": string, //Data
-                    "fiscal_drive_number": string,
-                    "rid":  number,
-                    "srid": string
-                }
+            "data": Array<ModelsExciseReportResponseDataInner
             >
         }
     }|undefined>
-
-    getPaidStorageStartTaskCrateReport(queryParams: PeriodFromTo): Promise<{
-        "data": {
-            "taskId": string
-        }
-    } | undefined>
-
-    getPaidStorageCheckStatusTaskReport(queryParams: { task_id: string }): Promise<{
-        "data": {
-            "id": string,
-            "status":StatusCratingStoragePaidReport
-
-        }
-    }|undefined>
-
-    getPaidStorageReport(queryParams: { taskId: string }):Promise<Array<PaidStorageReport>|undefined>
-
-    /**
-     * @description Promise.reject  <WbError|PaidAcceptedError400>
-     * @param queryParams
-     */
+    getPaidStorageStartTaskCrateReport(queryParams: PeriodFromTo): Promise<{ "data": CreateTaskResponseData } | undefined>
+    getPaidStorageCheckStatusTaskReport(queryParams: { task_id: string }): Promise<{ "data": GetTasksResponseData }|undefined>
+    getPaidStorageReport(queryParams: CreateTaskResponseData):Promise<Array<ResponsePaidStorageInner>|undefined>
     getPaidAcceptedReport(queryParams: PeriodFromTo):Promise<{
-        "report":Array<PaidStorageReport>
+        "report":Array<PaidAcceptedReport>
     }|undefined>
-
-    getAntifraudReport(queryParams:{
-        //Example: date=2023-12-01
-        date?:string
-    }):Promise<{
-      details:Array<{
-          "nmID":  number,
-          "sum":  number,
-          "currency": string,
-          "dateFrom": string,//Data
-          "dateTo": string,//Data
-      }>
-    }|undefined>
-
-
-    getIncorrectAttachmentsReport(queryParams:PeriodFromToData):Promise<Array<
-        {
-            "amount":  number,
-            "date": string,//Example: date=2023-12-01
-            "lostReason": string,
-            "nmID":  number,
-            "photoUrl": string,//url
-            "shkID": number
-        }>|undefined>
-
-
+    getAntifraudDetailsReport(queryParams:{ date?:string }):Promise<{ details:Array<InlineResponse2001Details> }|undefined>
+    getIncorrectAttachmentsReport(queryParams:PeriodFromToData):Promise<Array<InlineResponse2002Report>|undefined>
     getCoefficientStorage(queryParams:{data?:string}):Promise<{report:CoefficentItem}|undefined>
     // getCoefficientStorageAND_Logistic(queryParams:{
     //     //Example: date=2023-12-01
     //     date?:String
     // }):Promise<CoefficentItem|undefined>
 
-
-    getFineIncorrectMarkingReport(queryParams:PeriodFromToData):Promise<{
-        report:{
-            "amount":  number,
-            "date":String,//Data yyyy-mm-dd
-            "incomeId":  number,
-            "nmID":  number,
-            "photoUrls": Array<String>,
-            "shkID":  number,
-            "sku": string
-        }
-    }|undefined>
-
+    getFineIncorrectMarkingReport(queryParams:PeriodFromToData):Promise<{ report:Array<InlineResponse2004Report> }|undefined>
     getAntifraudForChangePropertyOutputReport(queryParams:PeriodFromToData):Promise<{
-        report:{
-            "amount":  number,
-            "date":String,//Data
-            "newBarcode": string,
-            "newColor": string,
-            "newSa": string,
-            "newShkID":  number,
-            "newSize": string,
-            "nmID":  number,
-            "oldBarcode": string,
-            "oldColor": string,
-            "oldSa": string,
-            "oldShkID":  number,
-            "oldSize": string
-        }
+        report:Array<InlineResponse2005Report>
     }>
 }
 
@@ -421,11 +1189,9 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @throws {WbError}
      * @async
      */
-    async  postGetStatsPeriod(queryData: Omit<ShameRequestStaticCard, "nmIDs">): Promise<(WbResponse & {
-        page:  number;
-        isNextPage: Boolean;
-        cards: Array<CardStatistic>
-    }) | undefined> {
+    async  postGetStatsPeriod(queryData: Omit<ShameRequestStaticCard, "nmIDs">):
+        Promise<(WbResponse &
+        NmReportDetailResponseData) | undefined> {
         return this.postFetch(this.listAPI.cardStatisticPeriod,queryData)
     }
 
@@ -441,14 +1207,9 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @throws {WbError}
      * @async
      */
-    async postGetStatsPeriodGroup(queryData: ShameRequestStaticCard): Promise<(WbResponse & {
-        page:  number;
-        isNextPage: Boolean;
-        cards: Array<CardStatistic>
-    }) | undefined> {
+    async postGetStatsPeriodGroup(queryData: ShameRequestStaticCard): Promise<(WbResponse &
+        NmReportDetailResponseData) | undefined> {
         return  this.postFetch(this.listAPI.cardStatisticPeriodGroped,queryData)
-
-
     }
 
     /**
@@ -459,19 +1220,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @throws {WbError}
      * @param queryData
      */
-    async postGetStatsDay(queryData: {
-        nmIDs: Array< number>;
-        period: StaticPeriod;
-        timezone?: string;
-        aggregationLevel?: "day" | "week"
-    }): Promise<WbResponse & {
-        data: Array<{
-            nmID: number;
-            imtName: string;
-            vendorCode: string;
-            history: HistoryNomenclatureStatisItem
-        }>
-    }|undefined> {
+
+    async postGetStatsDay(queryData: NmReportDetailHistoryRequest): Promise<WbResponse & { data: Array<NmReportDetailHistoryResponseData> } |undefined>{
         return this.postFetch(this.listAPI.cardStatisticOnDayNomenclatureID,queryData)
 
     }
@@ -488,16 +1238,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryData
      * @async
      */
-    async postGetStatsDayGroup(queryData: Omit<ShameRequestStaticCard, "orderBy" | "page"> & {
-        aggregationLevel?: "day" | "week"
-    }): Promise<WbResponse & {
-        data: Array<{
-            object: CardObject;
-            brandName: string;
-            tag: Omit<Tag, "color">;
-            history: HistoryNomenclatureStatisItem
-        }>
-    }|undefined> {
+    async postGetStatsDayGroup(queryData: Omit<ShameRequestStaticCard, 'orderBy' | 'page'> & { aggregationLevel?: 'day' | 'week' }): Promise<WbResponse & { data: Array<NmReportGroupedHistoryResponseData> }|undefined>{
         return this.postFetch(this.listAPI.cardStatisticOnDayGroped,queryData)
 
     }
@@ -526,17 +1267,9 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryParams
      * @async
      */
-    async getJemListReport(queryParams: { filter?: Array<uuid> }): Promise<(WbResponse & {
-        data: Array<{
-            id: uuid;
-            createdAt: string;
-            status: StatusCreatingJemReport;
-            name: string;
-            size:  number;
-            startDate: string;
-            endDate: string
-        }>
-    }) | undefined> {
+    async getJemListReport(queryParams: { filter?: Array<uuid> }): Promise<WbResponse & {
+        data: Array<NmReportGetReportsResponseData>
+    } | undefined>{
         let url  = new URL(this.listAPI.jemGetListReport)
         for (const urlElement of Object.entries(queryParams)) {
             urlElement[1].forEach(el=>url.searchParams.append(urlElement[0],el))
@@ -583,23 +1316,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryParams
      */
     async postOutputMustMark(queryData: { countries?: Array<string> }, queryParams: PeriodFromTo): Promise<{
-        response: {
-            data: Array<{
-                name: string;
-                price:  number;
-                currency_name_short: string;
-                excise_short: string;
-                barcode:  number;
-                nm_id:  number;
-                operation_type_id:  number;
-                fiscal_doc_number:  number;
-                fiscal_dt: string;
-                fiscal_drive_number: string;
-                rid:  number;
-                srid: string
-            }>
-        }
-    }| undefined> {
+        response: { data: Array<ModelsExciseReportResponseDataInner> } }| undefined> {
         let url = new URL(this.listAPI.fineForIncorrectMarkingReport)
         for (const urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
@@ -616,7 +1333,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @async
      * @param queryParams
      */
-    getPaidStorageStartTaskCrateReport(queryParams: PeriodFromTo): Promise<{ data: { taskId: string } } | undefined> {
+    async getPaidStorageStartTaskCrateReport(queryParams: PeriodFromTo): Promise<{ data: CreateTaskResponseData } | undefined> {
         let url = new URL(this.listAPI.storageCreateReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
@@ -632,11 +1349,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @async
      * @param queryParams
      */
-    async getPaidStorageCheckStatusTaskReport(queryParams: { task_id: string }): Promise<{
-        data: { id: string; status: StatusCratingStoragePaidReport }
-    } | undefined> {
+    async getPaidStorageCheckStatusTaskReport(queryParams: { task_id: string }): Promise<{ data: GetTasksResponseData } | undefined> {
         return  this.getFetch(this.listAPI.storageGetStatus(queryParams.task_id))
-
     }
 
 
@@ -647,8 +1361,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @async
      * @param queryParams
      */
-    async getPaidStorageReport(queryParams: { taskId: string }):
-        Promise<Array<PaidStorageReport>|undefined> {
+    async getPaidStorageReport(queryParams: CreateTaskResponseData): Promise<Array<ResponsePaidStorageInner>|undefined> {
         return this.getFetch( this.listAPI.storageGetStatus(queryParams.taskId)).then(async (resposne)=>{
             if(resposne?.ok){
                 return await resposne.json()
@@ -662,7 +1375,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @throws {WbErrorWithTitle | WbErrorWith500}
      * @async
      */
-    async getPaidAcceptedReport(queryParams: PeriodFromToData): Promise<{ report: Array<PaidStorageReport> } | undefined> {
+    async getPaidAcceptedReport(queryParams: PeriodFromToData): Promise<{ report: Array<PaidAcceptedReport> } | undefined> {
         let url = new URL(this.listAPI.acceptedReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
@@ -684,9 +1397,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      *  date=2023-12-01
      * @async
      */
-    async getAntifraudReport(queryParams: { date?: string }): Promise<{
-        details: Array<{ nmID:  number; sum:  number; currency: string; dateFrom: string; dateTo: string }>
-    } | undefined> {
+    async getAntifraudDetailsReport(queryParams: { date?: string }): Promise<{ details: Array<InlineResponse2001Details> } | undefined> {
         let url = new URL(this.listAPI.antifraudGetReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
@@ -705,14 +1416,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryParams
      * @async
      */
-    async getIncorrectAttachmentsReport(queryParams:PeriodFromToData): Promise<Array<{
-        amount:  number;
-        date: string;
-        lostReason: string;
-        nmID:  number;
-        photoUrl: string;
-        shkID: number
-    }> | undefined> {
+    async getIncorrectAttachmentsReport(queryParams:PeriodFromToData): Promise<Array<InlineResponse2002Report> | undefined> {
         let url = new URL(this.listAPI.antifraudIncorrectSendReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
@@ -730,7 +1434,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @example
      *  date=2023-12-01
      */
-    getCoefficientStorage(queryParams: {data?:string}): Promise<{ report: CoefficentItem } | undefined> {
+    async getCoefficientStorage(queryParams: {data?:string}): Promise<{ report: CoefficentItem } | undefined> {
         let url = new URL(this.listAPI.storageCoefficientReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
@@ -762,17 +1466,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * }
 
      */
-    getFineIncorrectMarkingReport(queryParams: PeriodFromToData): Promise<{
-        report: {
-            amount: number;
-            date: string;
-            incomeId: number;
-            nmID: number;
-            photoUrls: Array<string>;
-            shkID: number;
-            sku: string
-        }
-    } | undefined> {
+    async getFineIncorrectMarkingReport(queryParams: PeriodFromToData): Promise<{ report:Array<InlineResponse2004Report> } | undefined> {
         let url = new URL(this.listAPI.fineForIncorrectMarkingReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
@@ -794,21 +1488,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryParams
      */
     async getAntifraudForChangePropertyOutputReport(queryParams: PeriodFromToData): Promise<{
-        report: {
-            amount: number;
-            date: String;
-            newBarcode: string;
-            newColor: string;
-            newSa: string;
-            newShkID: number;
-            newSize: string;
-            nmID: number;
-            oldBarcode: string;
-            oldColor: string;
-            oldSa: string;
-            oldShkID: number;
-            oldSize: string
-        }
+        report:Array<InlineResponse2005Report>
     }> {
         let url = new URL(this.listAPI.antifraudForChangePropertyOutput)
         for (let urlElement of Object.entries(queryParams)) {
