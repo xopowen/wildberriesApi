@@ -136,7 +136,13 @@ type CardObject = {
  * @param end - Data format yy-mm-dd
  */
 type StaticPeriod = {
+    /**
+     *  Data format yy-mm-dd
+     */
     "begin": string,//Data
+    /**
+     *  Data format yy-mm-dd
+     */
     "end": string,//Data
 }
 /**
@@ -1106,43 +1112,44 @@ export interface InlineResponse2005Report {
     oldSize: string;
 }
 interface WbAnalystInterface {
-    postGetStatsPeriod(queryData: ShameRequestStaticCard): Promise<WbResponse & NmReportDetailResponseData | undefined>,
-    postGetStatsPeriodGroup(queryData: Omit<ShameRequestStaticCard, 'nmIDs'>): Promise<WbResponse & NmReportDetailResponseData | undefined>,
-    postGetStatsDay(queryData: NmReportDetailHistoryRequest): Promise<WbResponse & { data: Array<NmReportDetailHistoryResponseData> } |undefined>,
-    postGetStatsDayGroup(queryData: Omit<ShameRequestStaticCard, 'orderBy' | 'page'> & { aggregationLevel?: 'day' | 'week' }): Promise<WbResponse & { data: Array<NmReportGroupedHistoryResponseData> }|undefined>
-    postJemCreteReport(queryData: JemReportRequestNmID | JemReportRequestBandAndTag): Promise<WbResponse | undefined>
-    getJemListReport(queryParams: { filter?: Array<uuid> }): Promise<WbResponse & { data: Array<NmReportGetReportsResponseData> } | undefined>
-    postJemRepeatCreateReport(queryData: { downloadId: uuid }): Promise<WbResponse|undefined>
-    getJemReport(queryParams: { downloadId: uuid }): Promise<BinaryData|undefined>
-    postOutputMustMark(queryData: { countries?: Array<string> }, queryParams: PeriodFromTo): Promise<{
+    nmReportGroupedPost(queryData: ShameRequestStaticCard): Promise<WbResponse & NmReportDetailResponseData | undefined>,
+    nmReportGroupedTagBrandPost(queryData: Omit<ShameRequestStaticCard, 'nmIDs'>): Promise<WbResponse & NmReportDetailResponseData | undefined>,
+    nmReportDayGroupedPost(queryData: NmReportDetailHistoryRequest): Promise<WbResponse & { data: Array<NmReportDetailHistoryResponseData> } |undefined>,
+    nmReportDayGroupedTagBrandPost(queryData: Omit<ShameRequestStaticCard, 'orderBy' | 'page'> & { aggregationLevel?: 'day' | 'week' }): Promise<WbResponse & { data: Array<NmReportGroupedHistoryResponseData> }|undefined>
+    nmReportJemCretePost(queryData: JemReportRequestNmID | JemReportRequestBandAndTag): Promise<WbResponse | undefined>
+    nmReportJemListGet(queryParams: { filter?: Array<uuid> }): Promise<WbResponse & { data: Array<NmReportGetReportsResponseData> } | undefined>
+    nmReportJemRepeatPost(queryData: { downloadId: uuid }): Promise<WbResponse|undefined>
+    nmReportJemReportGet(queryParams: { downloadId: uuid }): Promise<BinaryData|undefined>
+
+    analyticsOutputMustMarkPost(queryData: { countries?: Array<string> }, queryParams: PeriodFromTo): Promise<{
         "response": {
             "data": Array<ModelsExciseReportResponseDataInner
             >
         }
     }|undefined>
-    getPaidStorageStartTaskCrateReport(queryParams: PeriodFromTo): Promise<{ "data": CreateTaskResponseData } | undefined>
-    getPaidStorageCheckStatusTaskReport(queryParams: { task_id: string }): Promise<{ "data": GetTasksResponseData }|undefined>
-    getPaidStorageReport(queryParams: CreateTaskResponseData):Promise<Array<ResponsePaidStorageInner>|undefined>
-    getPaidAcceptedReport(queryParams: PeriodFromTo):Promise<{
+
+    paidStorageCrateTaskReportGet(queryParams: PeriodFromTo): Promise<{ "data": CreateTaskResponseData } | undefined>
+    paidStorageCheckStatusTaskGet(queryParams: { task_id: string }): Promise<{ "data": GetTasksResponseData }|undefined>
+    paidStorageReportGet(queryParams: CreateTaskResponseData):Promise<Array<ResponsePaidStorageInner>|undefined>
+    paidAcceptedReportGet(queryParams: PeriodFromTo):Promise<{
         "report":Array<PaidAcceptedReport>
     }|undefined>
-    getAntifraudDetailsReport(queryParams:{ date?:string }):Promise<{ details:Array<InlineResponse2001Details> }|undefined>
-    getIncorrectAttachmentsReport(queryParams:PeriodFromToData):Promise<Array<InlineResponse2002Report>|undefined>
-    getCoefficientStorage(queryParams:{data?:string}):Promise<{report:CoefficentItem}|undefined>
+    analyseAntifraudDetailsReportGet(queryParams:{ date?:string }):Promise<{ details:Array<InlineResponse2001Details> }|undefined>
+    analyseIncorrectAttachmentsReportGet(queryParams:PeriodFromToData):Promise<Array<InlineResponse2002Report>|undefined>
+    analyseCoefficientStorageGet(queryParams:{data?:string}):Promise<{report:CoefficentItem}|undefined>
     // getCoefficientStorageAND_Logistic(queryParams:{
     //     //Example: date=2023-12-01
     //     date?:String
     // }):Promise<CoefficentItem|undefined>
 
-    getFineIncorrectMarkingReport(queryParams:PeriodFromToData):Promise<{ report:Array<InlineResponse2004Report> }|undefined>
-    getAntifraudForChangePropertyOutputReport(queryParams:PeriodFromToData):Promise<{
+    fineIncorrectMarkingReportGet(queryParams:PeriodFromToData):Promise<{ report:Array<InlineResponse2004Report> }|undefined>
+    antifraudForChangePropertyOutputReportGet(queryParams:PeriodFromToData):Promise<{
         report:Array<InlineResponse2005Report>
     }>
 }
 
-class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
-    protected additionURL = "/api";
-
+export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
+    wildberriesRU_URL = 'https://seller-analytics-api.wildberries.ru/api'
     protected listAPI = {
         //analyse seller
 
@@ -1178,6 +1185,7 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
         fineForIncorrectMarkingReport: '/v1/analytics/goods-labeling',
         antifraudForChangePropertyOutput: '/v1/analytics/characteristics-change'
     }
+ 
 
     /**
      * @description Получение статистики КТ за выбранный период, по nmID/предметам/брендам/тегам.
@@ -1189,10 +1197,10 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @throws {WbError}
      * @async
      */
-    async  postGetStatsPeriod(queryData: Omit<ShameRequestStaticCard, "nmIDs">):
+    async  nmReportGroupedPost(queryData: Omit<ShameRequestStaticCard, "nmIDs">):
         Promise<(WbResponse &
         NmReportDetailResponseData) | undefined> {
-        return this.postFetch(this.listAPI.cardStatisticPeriod,queryData)
+        return this.postFetch(this.wildberriesRU_URL+this.listAPI.cardStatisticPeriod,queryData)
     }
 
     /**
@@ -1207,9 +1215,9 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @throws {WbError}
      * @async
      */
-    async postGetStatsPeriodGroup(queryData: ShameRequestStaticCard): Promise<(WbResponse &
+    async nmReportGroupedTagBrandPost(queryData: ShameRequestStaticCard): Promise<(WbResponse &
         NmReportDetailResponseData) | undefined> {
-        return  this.postFetch(this.listAPI.cardStatisticPeriodGroped,queryData)
+        return  this.postFetch(this.wildberriesRU_URL+this.listAPI.cardStatisticPeriodGroped,queryData)
     }
 
     /**
@@ -1221,8 +1229,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryData
      */
 
-    async postGetStatsDay(queryData: NmReportDetailHistoryRequest): Promise<WbResponse & { data: Array<NmReportDetailHistoryResponseData> } |undefined>{
-        return this.postFetch(this.listAPI.cardStatisticOnDayNomenclatureID,queryData)
+    async nmReportDayGroupedPost(queryData: NmReportDetailHistoryRequest): Promise<WbResponse & { data: Array<NmReportDetailHistoryResponseData> } |undefined>{
+        return this.postFetch(this.wildberriesRU_URL+this.listAPI.cardStatisticOnDayNomenclatureID,queryData)
 
     }
 
@@ -1238,8 +1246,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryData
      * @async
      */
-    async postGetStatsDayGroup(queryData: Omit<ShameRequestStaticCard, 'orderBy' | 'page'> & { aggregationLevel?: 'day' | 'week' }): Promise<WbResponse & { data: Array<NmReportGroupedHistoryResponseData> }|undefined>{
-        return this.postFetch(this.listAPI.cardStatisticOnDayGroped,queryData)
+    async nmReportDayGroupedTagBrandPost(queryData: Omit<ShameRequestStaticCard, 'orderBy' | 'page'> & { aggregationLevel?: 'day' | 'week' }): Promise<WbResponse & { data: Array<NmReportGroupedHistoryResponseData> }|undefined>{
+        return this.postFetch(this.wildberriesRU_URL+this.listAPI.cardStatisticOnDayGroped,queryData)
 
     }
 
@@ -1255,8 +1263,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryData
      * @async
      */
-    async postJemCreteReport(queryData: JemReportRequestNmID | JemReportRequestBandAndTag): Promise<WbResponse | undefined> {
-        return this.postFetch(this.listAPI.jemCreateReport,queryData)
+    async nmReportJemCretePost(queryData: JemReportRequestNmID | JemReportRequestBandAndTag): Promise<WbResponse | undefined> {
+        return this.postFetch(this.wildberriesRU_URL+this.listAPI.jemCreateReport,queryData)
 
     }
 
@@ -1267,10 +1275,10 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryParams
      * @async
      */
-    async getJemListReport(queryParams: { filter?: Array<uuid> }): Promise<WbResponse & {
+    async nmReportJemListGet(queryParams: { filter?: Array<uuid> }): Promise<WbResponse & {
         data: Array<NmReportGetReportsResponseData>
     } | undefined>{
-        let url  = new URL(this.listAPI.jemGetListReport)
+        let url  = new URL(this.wildberriesRU_URL+this.listAPI.jemGetListReport)
         for (const urlElement of Object.entries(queryParams)) {
             urlElement[1].forEach(el=>url.searchParams.append(urlElement[0],el))
         }
@@ -1284,8 +1292,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryData
      * @async
      */
-    async postJemRepeatCreateReport(queryData: { downloadId: uuid }): Promise<WbResponse|undefined> {
-        return this.postFetch(this.listAPI.jemCreateRepeatReport,queryData)
+    async nmReportJemRepeatPost(queryData: { downloadId: uuid }): Promise<WbResponse|undefined> {
+        return this.postFetch(this.wildberriesRU_URL+this.listAPI.jemCreateRepeatReport,queryData)
 
     }
 
@@ -1296,8 +1304,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @throws {WbError}
      * @param queryParams
      */
-    async getJemReport(queryParams: { downloadId: uuid }): Promise<BinaryData|undefined> {
-        return fetch(new URL(this.listAPI.jemGetReport(queryParams.downloadId).toString()).toString(),{
+    async nmReportJemReportGet(queryParams: { downloadId: uuid }): Promise<BinaryData|undefined> {
+        return fetch(new URL(this.wildberriesRU_URL+this.listAPI.jemGetReport(queryParams.downloadId).toString()).toString(),{
             method:'GET',
             headers:{
                 Authorization:`${this.token}`,
@@ -1315,9 +1323,9 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryData
      * @param queryParams
      */
-    async postOutputMustMark(queryData: { countries?: Array<string> }, queryParams: PeriodFromTo): Promise<{
+    async analyticsOutputMustMarkPost(queryData: { countries?: Array<string> }, queryParams: PeriodFromTo): Promise<{
         response: { data: Array<ModelsExciseReportResponseDataInner> } }| undefined> {
-        let url = new URL(this.listAPI.fineForIncorrectMarkingReport)
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.fineForIncorrectMarkingReport)
         for (const urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
@@ -1333,8 +1341,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @async
      * @param queryParams
      */
-    async getPaidStorageStartTaskCrateReport(queryParams: PeriodFromTo): Promise<{ data: CreateTaskResponseData } | undefined> {
-        let url = new URL(this.listAPI.storageCreateReport)
+    async paidStorageCrateTaskReportGet(queryParams: PeriodFromTo): Promise<{ data: CreateTaskResponseData } | undefined> {
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.storageCreateReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
@@ -1349,8 +1357,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @async
      * @param queryParams
      */
-    async getPaidStorageCheckStatusTaskReport(queryParams: { task_id: string }): Promise<{ data: GetTasksResponseData } | undefined> {
-        return  this.getFetch(this.listAPI.storageGetStatus(queryParams.task_id))
+    async paidStorageCheckStatusTaskGet(queryParams: { task_id: string }): Promise<{ data: GetTasksResponseData } | undefined> {
+        return  this.getFetch(this.wildberriesRU_URL+this.listAPI.storageGetStatus(queryParams.task_id))
     }
 
 
@@ -1361,8 +1369,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @async
      * @param queryParams
      */
-    async getPaidStorageReport(queryParams: CreateTaskResponseData): Promise<Array<ResponsePaidStorageInner>|undefined> {
-        return this.getFetch( this.listAPI.storageGetStatus(queryParams.taskId)).then(async (resposne)=>{
+    async paidStorageReportGet(queryParams: CreateTaskResponseData): Promise<Array<ResponsePaidStorageInner>|undefined> {
+        return this.getFetch( this.wildberriesRU_URL+this.listAPI.storageGetStatus(queryParams.taskId)).then(async (resposne)=>{
             if(resposne?.ok){
                 return await resposne.json()
             }
@@ -1375,8 +1383,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @throws {WbErrorWithTitle | WbErrorWith500}
      * @async
      */
-    async getPaidAcceptedReport(queryParams: PeriodFromToData): Promise<{ report: Array<PaidAcceptedReport> } | undefined> {
-        let url = new URL(this.listAPI.acceptedReport)
+    async paidAcceptedReportGet(queryParams: PeriodFromToData): Promise<{ report: Array<PaidAcceptedReport> } | undefined> {
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.acceptedReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
@@ -1397,8 +1405,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      *  date=2023-12-01
      * @async
      */
-    async getAntifraudDetailsReport(queryParams: { date?: string }): Promise<{ details: Array<InlineResponse2001Details> } | undefined> {
-        let url = new URL(this.listAPI.antifraudGetReport)
+    async analyseAntifraudDetailsReportGet(queryParams: { date?: string }): Promise<{ details: Array<InlineResponse2001Details> } | undefined> {
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.antifraudGetReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
@@ -1416,8 +1424,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryParams
      * @async
      */
-    async getIncorrectAttachmentsReport(queryParams:PeriodFromToData): Promise<Array<InlineResponse2002Report> | undefined> {
-        let url = new URL(this.listAPI.antifraudIncorrectSendReport)
+    async analyseIncorrectAttachmentsReportGet(queryParams:PeriodFromToData): Promise<Array<InlineResponse2002Report> | undefined> {
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.antifraudIncorrectSendReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
@@ -1434,8 +1442,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @example
      *  date=2023-12-01
      */
-    async getCoefficientStorage(queryParams: {data?:string}): Promise<{ report: CoefficentItem } | undefined> {
-        let url = new URL(this.listAPI.storageCoefficientReport)
+    async analyseCoefficientStorageGet(queryParams: {data?:string}): Promise<{ report: CoefficentItem } | undefined> {
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.storageCoefficientReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
@@ -1466,8 +1474,8 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * }
 
      */
-    async getFineIncorrectMarkingReport(queryParams: PeriodFromToData): Promise<{ report:Array<InlineResponse2004Report> } | undefined> {
-        let url = new URL(this.listAPI.fineForIncorrectMarkingReport)
+    async fineIncorrectMarkingReportGet(queryParams: PeriodFromToData): Promise<{ report:Array<InlineResponse2004Report> } | undefined> {
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.fineForIncorrectMarkingReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
@@ -1487,10 +1495,10 @@ class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @async
      * @param queryParams
      */
-    async getAntifraudForChangePropertyOutputReport(queryParams: PeriodFromToData): Promise<{
+    async antifraudForChangePropertyOutputReportGet(queryParams: PeriodFromToData): Promise<{
         report:Array<InlineResponse2005Report>
     }> {
-        let url = new URL(this.listAPI.antifraudForChangePropertyOutput)
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.antifraudForChangePropertyOutput)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }

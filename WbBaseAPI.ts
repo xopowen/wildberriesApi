@@ -15,7 +15,7 @@ interface wbFetchFull extends wbFetch{
 }
 
 export class WbBaseAPI implements wbFetch{
-  protected wildberriesRU_URL = 'https://suppliers-api.wildberries.ru'
+  protected wildberriesRU_URL: unknown
 
   async getFetch(url: string): Promise<any|undefined> {
     return this.apiFetch(url,'GET').then(async (response)=>{
@@ -46,7 +46,7 @@ export class WbBaseAPI implements wbFetch{
          init.body = JSON.stringify(body)
        }
        return  fetch(url, init).then(async(response:Response)=>{
-         if(response.status === 200){
+         if(response.ok){
            return response
          }else{
            await response.json().then((data:{responseError:{status:Number,statusText:String},errorData:any})=>{
