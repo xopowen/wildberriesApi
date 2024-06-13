@@ -6,7 +6,7 @@ import {WbError, WbErrorData} from "./WbError";
 /**
  * TODO made doc
  */
-enum FiendSort {
+export enum FiendSort {
     openCard = 'openCard',
     addToCart = 'addToCart',
     orders = 'orders',
@@ -1136,14 +1136,14 @@ interface WbAnalystInterface {
     }|undefined>
     analyseAntifraudDetailsReportGet(queryParams:{ date?:string }):Promise<{ details:Array<InlineResponse2001Details> }|undefined>
     analyseIncorrectAttachmentsReportGet(queryParams:PeriodFromToData):Promise<Array<InlineResponse2002Report>|undefined>
-    analyseCoefficientStorageGet(queryParams:{data?:string}):Promise<{report:CoefficentItem}|undefined>
+    analyseCoefficientStorageGet(queryParams?:{date?:string}):Promise<{report:CoefficentItem}|undefined>
     // getCoefficientStorageAND_Logistic(queryParams:{
     //     //Example: date=2023-12-01
     //     date?:String
     // }):Promise<CoefficentItem|undefined>
 
-    fineIncorrectMarkingReportGet(queryParams:PeriodFromToData):Promise<{ report:Array<InlineResponse2004Report> }|undefined>
-    antifraudForChangePropertyOutputReportGet(queryParams:PeriodFromToData):Promise<{
+    analyseFineIncorrectMarkingReportGet(queryParams:PeriodFromToData):Promise<{ report:Array<InlineResponse2004Report> }|undefined>
+    analyseAntifraudForChangePropertyOutputReportGet(queryParams:PeriodFromToData):Promise<{
         report:Array<InlineResponse2005Report>
     }>
 }
@@ -1156,7 +1156,7 @@ export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
         //Sales funnel
         cardStatisticPeriod: "/v2/nm-report/detail",
         cardStatisticPeriodGroped: '/v2/nm-report/grouped',
-        cardStatisticOnDayNomenclatureID: 'v2/nm-report/detail/history',
+        cardStatisticOnDayNomenclatureID: '/v2/nm-report/detail/history',
         cardStatisticOnDayGroped: '/v2/nm-report/grouped/history',
 
         //Sales funnel
@@ -1275,12 +1275,14 @@ export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryParams
      * @async
      */
-    async nmReportJemListGet(queryParams: { filter?: Array<uuid> }): Promise<WbResponse & {
+    async nmReportJemListGet(queryParams?: { filter?: Array<uuid> }): Promise<WbResponse & {
         data: Array<NmReportGetReportsResponseData>
     } | undefined>{
         let url  = new URL(this.wildberriesRU_URL+this.listAPI.jemGetListReport)
-        for (const urlElement of Object.entries(queryParams)) {
-            urlElement[1].forEach(el=>url.searchParams.append(urlElement[0],el))
+        for (const urlElement of Object.entries(queryParams ?? {})) {
+            if(urlElement[1]){
+                urlElement[1].forEach(el=>url.searchParams.append(urlElement[0],el))
+            }
         }
         return this.getFetch(url.toString() )
 
@@ -1325,7 +1327,7 @@ export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      */
     async analyticsOutputMustMarkPost(queryData: { countries?: Array<string> }, queryParams: PeriodFromTo): Promise<{
         response: { data: Array<ModelsExciseReportResponseDataInner> } }| undefined> {
-        let url = new URL(this.wildberriesRU_URL+this.listAPI.fineForIncorrectMarkingReport)
+        let url = new URL(this.wildberriesRU_URL+this.listAPI.reportCardMustMarker)
         for (const urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
@@ -1370,11 +1372,7 @@ export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @param queryParams
      */
     async paidStorageReportGet(queryParams: CreateTaskResponseData): Promise<Array<ResponsePaidStorageInner>|undefined> {
-        return this.getFetch( this.wildberriesRU_URL+this.listAPI.storageGetStatus(queryParams.taskId)).then(async (resposne)=>{
-            if(resposne?.ok){
-                return await resposne.json()
-            }
-        })
+        return this.getFetch( this.wildberriesRU_URL+this.listAPI.storageGetReport(queryParams.taskId))
     }
 
     /**@description Возвращает даты и стоимость приёмки
@@ -1405,9 +1403,9 @@ export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      *  date=2023-12-01
      * @async
      */
-    async analyseAntifraudDetailsReportGet(queryParams: { date?: string }): Promise<{ details: Array<InlineResponse2001Details> } | undefined> {
+    async analyseAntifraudDetailsReportGet(queryParams?: { date?: string }): Promise<{ details: Array<InlineResponse2001Details> } | undefined> {
         let url = new URL(this.wildberriesRU_URL+this.listAPI.antifraudGetReport)
-        for (let urlElement of Object.entries(queryParams)) {
+        for (let urlElement of Object.entries(queryParams ?? {})) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
         return  this.getFetch(url.toString())
@@ -1442,9 +1440,9 @@ export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @example
      *  date=2023-12-01
      */
-    async analyseCoefficientStorageGet(queryParams: {data?:string}): Promise<{ report: CoefficentItem } | undefined> {
+    async analyseCoefficientStorageGet(queryParams?: {date?:string}): Promise<{ report: CoefficentItem } | undefined> {
         let url = new URL(this.wildberriesRU_URL+this.listAPI.storageCoefficientReport)
-        for (let urlElement of Object.entries(queryParams)) {
+        for (let urlElement of Object.entries(queryParams??{})) {
             url.searchParams.append(urlElement[0],urlElement[1])
         }
         return this.getFetch(url.toString())
@@ -1474,7 +1472,7 @@ export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * }
 
      */
-    async fineIncorrectMarkingReportGet(queryParams: PeriodFromToData): Promise<{ report:Array<InlineResponse2004Report> } | undefined> {
+    async analyseFineIncorrectMarkingReportGet(queryParams: PeriodFromToData): Promise<{ report:Array<InlineResponse2004Report> } | undefined> {
         let url = new URL(this.wildberriesRU_URL+this.listAPI.fineForIncorrectMarkingReport)
         for (let urlElement of Object.entries(queryParams)) {
             url.searchParams.append(urlElement[0],urlElement[1])
@@ -1495,7 +1493,7 @@ export default class WbAnalyst extends WbBaseAPI implements WbAnalystInterface {
      * @async
      * @param queryParams
      */
-    async antifraudForChangePropertyOutputReportGet(queryParams: PeriodFromToData): Promise<{
+    async analyseAntifraudForChangePropertyOutputReportGet(queryParams: PeriodFromToData): Promise<{
         report:Array<InlineResponse2005Report>
     }> {
         let url = new URL(this.wildberriesRU_URL+this.listAPI.antifraudForChangePropertyOutput)

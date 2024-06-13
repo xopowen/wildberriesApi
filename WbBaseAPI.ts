@@ -49,8 +49,8 @@ export class WbBaseAPI implements wbFetch{
          if(response.ok){
            return response
          }else{
-           await response.json().then((data:{responseError:{status:Number,statusText:String},errorData:any})=>{
-              return Promise.reject({responseError:{status:response.status,statusText:response.statusText},errorData:data})
+           await response.json().then((data:{status:Number,statusText:String,errorData:any})=>{
+              return Promise.reject({status:response.status,statusText:response.statusText,errorData:data})
            })
          }
        })
